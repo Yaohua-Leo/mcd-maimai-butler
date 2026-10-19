@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>麦麦管家 · 小程序样式预览</title>
+<style>
+  :root {
+    --gold: #ffbc0d; --red: #db241c; --red-dark: #a51c16;
+    --cream: #fff8df; --ink: #171717; --muted: #777;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #2b2b2b;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: 40px 20px;
+  }
+  h1 { color: #fff; text-align: center; font-size: 22px; margin-bottom: 8px; }
+  .sub { color: #999; text-align: center; font-size: 13px; margin-bottom: 36px; }
+  .frames { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; }
+  .phone {
+    width: 375px; min-height: 720px; background: var(--cream);
+    border-radius: 40px; overflow: hidden; padding-bottom: 32px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.4);
+    font-size: 14px; line-height: 1.5; color: var(--ink);
+  }
+  .phone .nav {
+    background: var(--gold); padding: 14px 16px; text-align: center;
+    font-weight: 800; font-size: 14px;
+  }
+  .stage-label { color: #aaa; text-align: center; margin-top: 10px; font-size: 12px; }
+  .wrap { padding: 0 16px; }
+
+  /* ===== shared (mirror app.wxss) ===== */
+  .cta {
+    display: flex; align-items: center; justify-content: center;
+    padding: 15px 20px; border-radius: 999px; color: #fff;
+    background: var(--red); font-size: 16px; font-weight: 800;
+    letter-spacing: 1px; box-shadow: 0 6px 14px rgba(219,36,28,.28);
+  }
+  .cta.disabled { background: #d8c9a8; box-shadow: none; }
+  .ghost-btn { text-align: center; padding: 11px 14px; color: #8a7a4f; font-size: 13px; }
+  .card { padding: 18px 16px; border-radius: 14px; background: #fff; box-shadow: 0 5px 15px rgba(23,23,23,.06); }
+  .section-title { display: block; font-size: 23px; font-weight: 900; margin-bottom: 6px; }
+  .section-copy { display: block; margin-bottom: 17px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+  .topbar { display: flex; align-items: center; margin: 12px 16px 16px; }
+  .back-btn {
+    display: inline-flex; align-items: center; margin-right: auto;
+    padding: 6px 14px 6px 12px; border-radius: 999px; background: #fff;
+    box-shadow: 0 2px 6px rgba(23,23,23,.06); color: #555; font-size: 13px; font-weight: 600;
+  }
+  .step-label { margin-left: auto; color: #8a7a4f; font-size: 11px; }
+
+  /* ===== home ===== */
+  .hero { margin: 0; padding: 20px 20px 28px; background: var(--gold); border-radius: 0 0 28px 28px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-mark {
+    width: 34px; height: 34px; border-radius: 10px; background: var(--red);
+    color: var(--gold); font-weight: 900; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(165,28,22,.35);
+  }
+  .brand-word { display: flex; flex-direction: column; }
+  .brand-name { font-size: 16px; font-weight: 900; letter-spacing: 1px; }
+  .brand-tag { color: rgba(23,23,23,.55); font-size: 9px; letter-spacing: 2px; }
+  .brand-note {
+    margin-left: auto; padding: 4px 9px; border-radius: 999px;
+    background: rgba(255,255,255,.65); color: var(--red-dark);
+    font-size: 10px; font-weight: 700;
+  }
+  .hero-copy { margin-top: 36px; }
+  .hero-title { display: block; font-size: 38px; font-weight: 900; line-height: 1.15; white-space: pre-line; }
+  .hero-sub { display: block; margin-top: 12px; color: rgba(23,23,23,.72); font-size: 14px; line-height: 1.7; }
+  .hero-art { position: relative; height: 95px; margin: 10px 0 4px; }
+  .art-burger {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 85px; height: 85px; border-radius: 50%; background: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 48px;
+    box-shadow: 0 8px 20px rgba(23,23,23,.12);
+  }
+  .art-chip {
+    position: absolute; top: 50%; width: 46px; height: 46px; border-radius: 14px;
+    background: var(--red); display: flex; align-items: center; justify-content: center;
+    font-size: 24px; box-shadow: 0 5px 12px rgba(165,28,22,.3);
+  }
+  .art-chip-a { left: 8%; transform: translateY(-70%) rotate(-10deg); }
+  .art-chip-b { right: 8%; transform: translateY(-30%) rotate(8deg); background: var(--ink); }
+  .hero .cta { margin-top: 12px; }
+  .hero-hints { display: flex; justify-content: center; gap: 7px; margin-top: 14px; flex-wrap: wrap; }
+  .hint-pill {
+    padding: 5px 11px; border-radius: 999px; border: 1px solid rgba(23,23,23,.25);
+    color: rgba(23,23,23,.75); font-size: 10px; font-weight: 600;
+  }
+  .how { padding: 22px 16px 0; display: flex; flex-direction: column; gap: 10px; }
+  .how-card {
+    display: flex; align-items: center; gap: 12px; padding: 15px 16px;
+    border-radius: 12px; background: #fff; box-shadow: 0 4px 12px rgba(23,23,23,.05);
+  }
+  .how-num {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--gold);
+    font-weight: 900; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .how-title { display: block; font-size: 15px; font-weight: 800; }
+  .how-copy { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+  .notice {
+    margin: 18px 16px 0; padding: 14px 15px; border-radius: 12px;
+    background: #fff3d6; border: 1px solid #f2dfae;
+  }
+  .notice-title { display: block; color: #8a6420; font-size: 13px; font-weight: 800; }
+  .notice-copy { display: block; margin-top: 5px; color: #97762f; font-size: 11px; line-height: 1.65; }
+
+  /* ===== location ===== */
+  .card-icon { display: block; font-size: 32px; margin-bottom: 9px; }
+  .card-title { display: block; font-size: 16px; font-weight: 800; }
+  .card-copy { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+  .card-cta { margin-top: 15px; }
+  .city-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .city-chip {
+    padding: 9px 16px; border-radius: 999px; border: 1px solid #eee0bd;
+    background: #fffdf6; color: #6b5b33; font-size: 13px; font-weight: 600;
+  }
+  .city-chip.active { background: var(--ink); border-color: var(--ink); color: var(--gold); }
+  .manual { margin-top: 12px; }
+  .manual-title { display: block; margin-bottom: 10px; color: var(--muted); font-size: 12px; font-weight: 600; }
+
+  /* ===== question ===== */
+  .progress { height: 6px; margin: 0 16px 18px; border-radius: 999px; background: #f3e6bd; overflow: hidden; }
+  .progress-fill { height: 100%; width: 66%; background: var(--red); border-radius: inherit; }
+  .question-kicker { display: block; margin: 0 16px 7px; color: var(--red); font-size: 12px; font-weight: 800; letter-spacing: 2px; }
+  .q-wrap { padding: 0 16px; }
+  .choice-list { display: flex; flex-direction: column; gap: 9px; }
+  .choice {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 15px 16px; border-radius: 12px; border: 2px solid transparent;
+    background: #fff; box-shadow: 0 4px 11px rgba(23,23,23,.05); font-size: 15px; font-weight: 700;
+  }
+  .choice.selected { border-color: var(--red); background: #fff5ec; color: var(--red-dark); }
+  .choice-check {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--red);
+    color: #fff; font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .question-footer { display: flex; align-items: center; gap: 8px; margin-top: 22px; }
+  .question-footer .cta { flex: 1; }
+
+  /* ===== result ===== */
+  .result-hero { padding: 22px 20px 22px; background: var(--gold); border-radius: 0 0 28px 28px; }
+  .result-kicker { display: block; color: rgba(23,23,23,.6); font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+  .result-title { display: block; margin-top: 7px; font-size: 26px; font-weight: 900; }
+  .result-sub { display: block; margin-top: 5px; color: rgba(23,23,23,.72); font-size: 13px; }
+  .badge-row { margin-top: 11px; }
+  .badge { display: inline-block; padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+  .badge-warn { background: #fff; color: #8a6420; }
+  .meal-card { margin: -14px 16px 0; position: relative; }
+  .meal-items { padding: 4px 12px; border-radius: 10px; background: var(--cream); }
+  .meal-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; }
+  .meal-item + .meal-item { border-top: 1px dashed #ecd9a8; }
+  .meal-item-left { display: flex; align-items: center; gap: 9px; }
+  .item-type { padding: 3px 8px; border-radius: 5px; background: var(--gold); font-size: 10px; font-weight: 800; }
+  .item-name { font-size: 14px; font-weight: 700; }
+  .item-price { color: #555; font-size: 13px; font-weight: 600; }
+  .stats-row { display: flex; gap: 8px; margin: 13px 0 3px; }
+  .stat { flex: 1; padding: 11px 4px; border-radius: 9px; background: var(--cream); text-align: center; }
+  .stat-value { display: block; font-size: 16px; font-weight: 900; }
+  .stat-label { display: block; margin-top: 3px; color: #8a7a4f; font-size: 10px; }
+  .price-row { display: flex; align-items: baseline; justify-content: space-between; margin: 11px 0; }
+  .price { color: var(--red); font-size: 28px; font-weight: 900; }
+  .price-source { max-width: 55%; color: #a08b52; font-size: 10px; text-align: right; }
+  .reason { padding: 12px 13px; border-radius: 9px; border-left: 4px solid var(--gold); background: #fffdf4; }
+  .reason-title { display: block; font-size: 12px; font-weight: 800; }
+  .reason-copy { display: block; margin-top: 4px; color: #6b5b33; font-size: 12px; line-height: 1.65; }
+  .source-line { display: block; margin-top: 10px; color: #a08b52; font-size: 10px; }
+  .alt-title { display: block; margin: 20px 16px 9px; font-size: 16px; font-weight: 900; }
+  .alt {
+    display: flex; align-items: center; margin: 0 16px; padding: 13px 14px;
+    border-radius: 12px; background: #fff; box-shadow: 0 4px 11px rgba(23,23,23,.05);
+  }
+  .alt + .alt { margin-top: 8px; }
+  .alt-index {
+    width: 28px; height: 28px; margin-right: 11px; border-radius: 50%;
+    background: var(--gold); font-size: 13px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .alt-content { flex: 1; }
+  .alt-name { display: block; font-size: 14px; font-weight: 800; }
+  .alt-meta { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+  .alt-arrow { color: var(--red); font-size: 20px; font-weight: 800; margin-left: 6px; }
+  .disabled-order { margin: 16px 16px 0; padding: 14px 15px; border-radius: 12px; background: #f0ebdd; }
+  .disabled-order-title { display: block; color: #6b5b33; font-size: 13px; font-weight: 800; }
+  .disabled-order-copy { display: block; margin-top: 5px; color: #8a7a4f; font-size: 11px; line-height: 1.6; }
+  .setting-card { margin: 14px 16px 0; padding: 4px 16px; }
+  .setting-row { display: flex; align-items: center; padding: 13px 0; }
+  .setting-body { flex: 1; }
+  .card-title-sm { display: block; font-size: 14px; font-weight: 800; }
+  .setting-copy { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+  .divider { height: 1px; background: #f3ead2; }
+  .switch { width: 42px; height: 24px; border-radius: 999px; background: var(--red); position: relative; }
+  .switch::after {
+    content: ""; position: absolute; right: 2px; top: 2px;
+    width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  }
+  .secondary-btn {
+    display: flex; align-items: center; justify-content: center; margin: 18px 16px 0;
+    padding: 13px 18px; border-radius: 999px; color: var(--red-dark);
+    background: #fff; border: 2px solid var(--red); font-size: 15px; font-weight: 700;
+  }
+  .footer-note { margin: 18px 16px 0; color: #a08b52; font-size: 10px; line-height: 1.6; text-align: center; }
+</style>
+</head>
+<body>
+  <h1>麦麦管家 · 小程序四屏样式预览</h1>
+  <p class="sub">与 src/pages/index 的 WXML/WXSS 保持同一套设计语言（麦当劳金 #FFBC0D / 红 #DB241C / 奶油底）</p>
+
+  <div class="frames">
+
+    <!-- 首页 -->
+    <div>
+      <div class="phone">
+        <div class="nav">麦麦管家</div>
+        <div class="hero">
+          <div class="brand">
+            <div class="brand-mark">麦</div>
+            <div class="brand-word">
+              <span class="brand-name">麦麦管家</span>
+              <span class="brand-tag">MAIMAI BUTLER</span>
+            </div>
+            <span class="brand-note">推荐体验版</span>
+          </div>
+          <div class="hero-copy">
+            <span class="hero-title">这一餐，
+刚刚好</span>
+            <span class="hero-sub">回答 3 个可以跳过的小问题，60 秒内给你一份合适的麦当劳一人餐。</span>
+          </div>
+          <div class="hero-art">
+            <div class="art-burger">🍔</div>
+            <div class="art-chip art-chip-a">🍟</div>
+            <div class="art-chip art-chip-b">🥤</div>
+          </div>
+          <div class="cta">帮我选一餐</div>
+          <div class="hero-hints">
+            <span class="hint-pill">不登录也能用</span>
+            <span class="hint-pill">问题都能跳过</span>
+            <span class="hint-pill">营养来源透明</span>
+          </div>
+        </div>
+        <div class="how">
+          <div class="how-card"><span class="how-num">1</span><div><span class="how-title">选位置</span><span class="how-copy">一次性定位，拒绝也能手动选城市</span></div></div>
+          <div class="how-card"><span class="how-num">2</span><div><span class="how-title">说偏好</span><span class="how-copy">预算、口味、吃法，都可跳过</span></div></div>
+          <div class="how-card"><span class="how-num">3</span><div><span class="how-title">拿方案</span><span class="how-copy">一个主推荐 + 两个替换，价格营养写清楚</span></div></div>
+        </div>
+        <div class="notice">
+          <span class="notice-title">💡 体验版说明</span>
+          <span class="notice-copy">当前为推荐体验版：不创建真实订单，餐费只通过麦当劳官方链路支付。</span>
+        </div>
+      </div>
+      <div class="stage-label">① 首页 Home</div>
+    </div>
+
+    <!-- 位置 -->
+    <div>
+      <div class="phone">
+        <div class="nav">麦麦管家</div>
+        <div class="topbar"><span class="back-btn">‹ 返回</span><span class="step-label">第 1 步 · 选门店</span></div>
+        <div class="wrap">
+          <span class="section-title">在哪儿吃？</span>
+          <span class="section-copy">位置只用于本次推荐附近门店，不会持续定位。</span>
+          <div class="card">
+            <span class="card-icon">📍</span>
+            <span class="card-title">用当前位置找附近门店</span>
+            <span class="card-copy">仅本次使用，拒绝定位也可以继续。</span>
+            <div class="cta card-cta">允许一次性定位</div>
+            <div class="ghost-btn">手动选择城市</div>
+          </div>
+          <div class="card manual">
+            <span class="manual-title">选择一个城市（演示门店）</span>
+            <div class="city-grid">
+              <span class="city-chip active">北京</span>
+              <span class="city-chip">上海</span>
+              <span class="city-chip">深圳</span>
+              <span class="city-chip">广州</span>
+            </div>
+            <div class="cta card-cta">确认城市</div>
+            <div class="ghost-btn">都不合适，用通用菜单快照</div>
+          </div>
+        </div>
+      </div>
+      <div class="stage-label">② 位置选择 Location</div>
+    </div>
+
+    <!-- 提问 -->
+    <div>
+      <div class="phone">
+        <div class="nav">麦麦管家</div>
+        <div class="topbar"><span class="back-btn">‹ 返回</span><span class="step-label">北京 · 北京望京街店</span></div>
+        <div class="progress"><div class="progress-fill"></div></div>
+        <span class="question-kicker">问题 2 / 3</span>
+        <div class="q-wrap">
+          <span class="section-title">今天想吃哪种感觉？</span>
+          <span class="section-copy">告诉我一个大方向，具体搭配交给我。</span>
+          <div class="choice-list">
+            <div class="choice">满足一点，想吃得过瘾</div>
+            <div class="choice selected">清爽一点，别太有负担 <span class="choice-check">✓</span></div>
+            <div class="choice">均衡就好</div>
+          </div>
+          <div class="question-footer">
+            <div class="ghost-btn">跳过</div>
+            <div class="cta">下一题</div>
+          </div>
+        </div>
+      </div>
+      <div class="stage-label">③ 三问（可跳过）</div>
+    </div>
+
+    <!-- 结果 -->
+    <div>
+      <div class="phone">
+        <div class="nav">麦麦管家</div>
+        <div class="result-hero">
+          <span class="result-kicker">为你搭配 · 北京 · 北京望京街店</span>
+          <span class="result-title">清爽轻盈一人餐</span>
+          <span class="result-sub">板烧鸡腿堡 · 玉米杯 · 纯牛奶</span>
+          <div class="badge-row"><span class="badge badge-warn">非实时数据 · 2026-10-11 14:00</span></div>
+        </div>
+        <div class="card meal-card">
+          <div class="meal-items">
+            <div class="meal-item"><div class="meal-item-left"><span class="item-type">主食</span><span class="item-name">板烧鸡腿堡</span></div><span class="item-price">¥22.00</span></div>
+            <div class="meal-item"><div class="meal-item-left"><span class="item-type">配餐</span><span class="item-name">玉米杯</span></div><span class="item-price">¥9.00</span></div>
+            <div class="meal-item"><div class="meal-item-left"><span class="item-type">饮料</span><span class="item-name">纯牛奶</span></div><span class="item-price">¥8.00</span></div>
+          </div>
+          <div class="stats-row">
+            <div class="stat"><span class="stat-value">610</span><span class="stat-label">热量 kcal</span></div>
+            <div class="stat"><span class="stat-value">29g</span><span class="stat-label">蛋白质</span></div>
+            <div class="stat"><span class="stat-value">780mg</span><span class="stat-label">钠</span></div>
+          </div>
+          <div class="price-row"><span class="price">¥39.00</span><span class="price-source">demo fixture（待 MCP 验证）</span></div>
+          <div class="reason">
+            <span class="reason-title">为什么是这一餐</span>
+            <span class="reason-copy">优先选择蔬菜配餐和相对清爽的主食，适合今天想吃轻一点的你。</span>
+          </div>
+          <span class="source-line">营养来源：demo fixture（待 MCP 验证） · 估算字段不冒充官方数据</span>
+        </div>
+        <span class="alt-title">换一换</span>
+        <div class="alt"><span class="alt-index">1</span><div class="alt-content"><span class="alt-name">经典满足一人餐</span><span class="alt-meta">均衡满足 · ¥44.00</span></div><span class="alt-arrow">›</span></div>
+        <div class="alt"><span class="alt-index">2</span><div class="alt-content"><span class="alt-name">刚刚好一人餐</span><span class="alt-meta">预算友好 · ¥25.00</span></div><span class="alt-arrow">›</span></div>
+        <div class="disabled-order">
+          <span class="disabled-order-title">🔒 下单能力待验证</span>
+          <span class="disabled-order-copy">体验版不创建真实订单。G2 通过后展示订单确认卡与官方付款说明。</span>
+        </div>
+        <div class="card setting-card">
+          <div class="setting-row">
+            <div class="setting-body"><span class="card-title-sm">记忆与个性化</span><span class="setting-copy">已同意保存本次偏好</span></div>
+            <div class="switch"></div>
+          </div>
+          <div class="divider"></div>
+          <div class="setting-row">
+            <div class="setting-body"><span class="card-title-sm">连接麦当劳账号</span><span class="setting-copy">未连接 · 用户自带 Token 测试版</span></div>
+            <span class="alt-arrow">›</span>
+          </div>
+        </div>
+        <div class="secondary-btn">重新回答</div>
+        <p class="footer-note">麦麦管家免费，不收取餐费；所有餐费仅支付给麦当劳官方。</p>
+      </div>
+      <div class="stage-label">④ 推荐结果 Result</div>
+    </div>
+
+  </div>
+</body>
+</html>

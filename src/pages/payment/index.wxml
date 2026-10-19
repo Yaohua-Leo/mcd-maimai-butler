@@ -1,0 +1,2 @@
+<web-view wx:if="{{url}}" src="{{url}}" binderror="onPaymentError"></web-view>
+<view wx:else class="payment-state"><text class="payment-title">麦当劳官方付款</text><text>{{loading ? '正在核对订单并打开官方付款页…' : error}}</text><block wx:if="{{!loading}}"><button disabled="{{copyBusy}}" bindtap="loadPayment">重新打开官方付款页</button><button disabled="{{copyBusy}}" bindtap="copyOfficialLink">{{copyBusy ? '正在核对订单…' : '复制官方付款链接'}}</button><text wx:if="{{copied}}">已复制。可在浏览器粘贴打开，完成后返回订单页刷新。请勿公开或转发此链接。</text></block><button bindtap="goBack">返回订单页并刷新状态</button></view>

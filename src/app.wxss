@@ -1,0 +1,119 @@
+/* 麦麦管家 · 麦当劳风格设计变量与基础样式
+   金色 #FFBC0D / 红 #DB241C / 深红 #A51C16 / 奶油 #FFF8DF / 墨 #171717 */
+
+page {
+  background: #fff8df;
+  color: #171717;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-size: inherit;
+  line-height: inherit;
+}
+button::after { border: 0; }
+
+/* 主按钮：麦当劳红 + 胶囊形 */
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx 40rpx;
+  border-radius: 999rpx;
+  color: #fff;
+  background: #db241c;
+  font-size: 32rpx;
+  font-weight: 800;
+  letter-spacing: 2rpx;
+  box-shadow: 0 12rpx 28rpx rgba(219, 36, 28, 0.28);
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.cta:active { transform: scale(0.97); opacity: 0.92; }
+.cta[disabled] {
+  color: #fff;
+  background: #d8c9a8;
+  box-shadow: none;
+}
+
+.secondary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26rpx 36rpx;
+  border-radius: 999rpx;
+  color: #a51c16;
+  background: #fff;
+  border: 3rpx solid #db241c;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.secondary-btn:active { background: #fff0ec; }
+
+.ghost-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22rpx 28rpx;
+  color: #8a7a4f;
+  font-size: 27rpx;
+}
+.ghost-btn:active { color: #a51c16; }
+
+/* 通用卡片 */
+.card {
+  padding: 36rpx 32rpx;
+  border-radius: 28rpx;
+  background: #fff;
+  box-shadow: 0 10rpx 30rpx rgba(23, 23, 23, 0.06);
+}
+
+.section-title {
+  display: block;
+  margin: 0 0 12rpx;
+  color: #171717;
+  font-size: 46rpx;
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: 1rpx;
+}
+.section-copy {
+  display: block;
+  margin: 0 0 34rpx;
+  color: #777;
+  font-size: 26rpx;
+  line-height: 1.65;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+.back-btn {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  margin-right: auto;
+  padding: 12rpx 28rpx 12rpx 24rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(23, 23, 23, 0.06);
+  color: #555;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.back-btn:active { background: #fff0ec; color: #a51c16; }
+.step-label {
+  margin-left: auto;
+  max-width: 60%;
+  overflow: hidden;
+  color: #8a7a4f;
+  font-size: 22rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

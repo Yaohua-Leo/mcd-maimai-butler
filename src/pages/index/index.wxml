@@ -1,0 +1,733 @@
+<!-- 麦麦管家 · 单页流程：home → login → location → question → result → profile/connect -->
+<view class="page">
+
+  <!-- ============ 首页 ============ -->
+  <block wx:if="{{stage === 'home'}}">
+    <view class="hero">
+      <view class="brand">
+        <view class="brand-mark">麦</view>
+        <view class="brand-word">
+          <text class="brand-name">麦麦管家</text>
+          <text class="brand-tag">MAIMAI BUTLER</text>
+        </view>
+        <button class="profile-entry" hover-class="entry-pressed" bindtap="openProfile">{{loggedIn ? '我的' : '登录 / 我的'}}</button>
+      </view>
+
+      <view class="hero-copy">
+        <text class="hero-title" decode="{{true}}">这一餐，\n刚刚好</text>
+      </view>
+
+      <view class="hero-art">
+        <view class="art-burger">🍔</view>
+        <view class="art-chip art-chip-a">🍟</view>
+        <view class="art-chip art-chip-b">🥤</view>
+      </view>
+
+      <button class="cta" bindtap="startFlow">定位并选择附近餐厅</button>
+
+      <view class="agent-entry">
+        <view class="agent-entry-heading">
+          <text class="agent-entry-kicker">Agent 帮你选餐</text>
+          <button class="agent-provider-switch" disabled="{{agentBusy}}" bindtap="openProviderSettings">切换供应商 ›</button>
+        </view>
+        <text class="agent-provider-current">{{providerReady ? '当前：' + activeProvider.label + ' · ' + activeProvider.model : '正在确认供应商…'}}</text>
+        <text class="agent-entry-copy">{{storeConfirmed ? '已选：' + selectedStore.storeName : '先定位并确认餐厅，再告诉 Agent 预算和口味。'}}</text>
+        <button class="agent-submit" bindtap="openAgentComposer">{{storeConfirmed ? '按这家餐厅选餐' : '先选择餐厅'}}</button>
+        <text wx:if="{{agentFeedback}}" class="agent-feedback">{{agentFeedback}}</text>
+      </view>
+    </view>
+
+    <view class="how">
+      <view class="how-card">
+        <text class="how-num">1</text>
+        <view class="how-body">
+          <text class="how-title">先选餐厅</text>
+          <text class="how-copy">定位附近门店，查看位置并确认餐厅</text>
+        </view>
+      </view>
+      <view class="how-card">
+        <text class="how-num">2</text>
+        <view class="how-body">
+          <text class="how-title">再说偏好</text>
+          <text class="how-copy">Agent 按选定门店的菜单和你的要求选餐</text>
+        </view>
+      </view>
+      <view class="how-card">
+        <text class="how-num">3</text>
+        <view class="how-body">
+          <text class="how-title">拿方案</text>
+          <text class="how-copy">一个主推荐 + 两个替换，价格营养写清楚</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="notice">
+      <text class="notice-title">💡 服务说明</text>
+      <text class="notice-copy">真实下单需链接本人麦当劳账号并具备下单权限，每笔操作由你确认。餐费通过麦当劳官方入口支付，麦麦管家不收取任何费用。</text>
+      <text class="notice-copy">麦麦管家为独立开发作品，非麦当劳官方产品。</text>
+      <button class="privacy-link" bindtap="openAbout">使用与隐私说明 ›</button>
+    </view>
+
+    <view wx:if="{{!tokenLinked}}" class="mcp-connect-card">
+      <text class="mcp-kicker">链接你的麦当劳账户</text>
+      <text class="mcp-title">登录麦当劳 MCP，复制 Token 后再回来</text>
+      <text class="mcp-copy">{{tokenLinked ? '已链接。生成推荐时会尝试使用实时 MCP 菜单；失败会明确标注。' : '先打开官方登录页获取 Token，再进入链接页。'}}</text>
+      <button class="ghost-btn" bindtap="openConnection">前往链接页</button>
+    </view>
+  </block>
+
+  <!-- ============ 麦麦管家登录 ============ -->
+  <block wx:if="{{stage === 'login'}}">
+    <view class="topbar auth-topbar">
+      <button class="back-btn" bindtap="backFromAccount">‹ 返回</button>
+      <text class="step-label">登录麦麦管家</text>
+    </view>
+
+    <view class="auth-card">
+      <view class="auth-mark">麦</view>
+      <text class="auth-title">登录后管理你的偏好</text>
+      <text class="auth-copy">确认微信身份后，下一步由你选择头像、填写昵称。</text>
+      <button class="privacy-link" bindtap="openAbout">查看使用与隐私说明 ›</button>
+      <button class="cta auth-cta" loading="{{loginBusy}}" disabled="{{loginBusy}}" bindtap="startWechatLogin">{{loginBusy ? '正在登录…' : '微信登录'}}</button>
+      <text class="auth-status">{{loginStatus}}</text>
+      <button class="secondary-btn auth-cta" disabled="{{loginBusy}}" bindtap="viewGuestProfile">以游客查看我的</button>
+      <button class="ghost-btn" disabled="{{loginBusy}}" bindtap="openConnection">链接麦当劳 MCP</button>
+    </view>
+  </block>
+
+  <!-- 微信身份已确认；头像昵称由用户主动填写 -->
+  <block wx:if="{{stage === 'profile-edit'}}">
+    <view class="topbar">
+      <button class="back-btn" disabled="{{profileBusy}}" bindtap="skipUserProfile">‹ 返回</button>
+      <text class="step-label">头像与昵称</text>
+    </view>
+    <view class="card profile-editor">
+      <text class="section-title">完善头像昵称</text>
+      <text class="section-copy">已确认微信身份。点击下方头像选择微信头像，再点击昵称输入框填写。</text>
+      <form bindsubmit="saveUserProfile">
+        <button class="avatar-choose" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" binderror="onAvatarError" disabled="{{profileBusy}}">
+          <image wx:if="{{profileDraft.avatarUrl}}" class="avatar-preview" src="{{profileDraft.avatarUrl}}" mode="aspectFill" />
+          <text wx:else class="avatar-placeholder">＋</text>
+        </button>
+        <text class="avatar-choose-label">{{profileDraft.avatarUrl ? '点击更换头像' : '选择微信头像'}}</text>
+        <label class="settings-label" for="profile-nickname">昵称</label>
+        <input id="profile-nickname" class="settings-input nickname-input" name="nickName" type="nickname" value="{{profileDraft.nickName}}" bindinput="onProfileNickname" bindblur="onProfileNickname" bindnicknamereview="onNicknameReview" placeholder="填写昵称 / 使用微信昵称" maxlength="32" disabled="{{profileBusy}}" />
+        <text class="setting-copy profile-storage-note">保存后在本机显示，可随时在“我的”中修改。</text>
+        <text wx:if="{{profileFeedback}}" class="provider-feedback">{{profileFeedback}}</text>
+        <button class="cta profile-save" form-type="submit" loading="{{profileBusy}}" disabled="{{profileBusy}}">保存并继续</button>
+      </form>
+      <button class="ghost-btn" disabled="{{profileBusy}}" bindtap="skipUserProfile">{{profileComplete ? '保留原资料' : '暂不填写'}}</button>
+    </view>
+  </block>
+
+  <!-- ============ 位置选择 ============ -->
+  <block wx:if="{{stage === 'location'}}">
+    <view class="topbar">
+      <button class="back-btn" bindtap="backHome">‹ 返回</button>
+      <text class="step-label">第 1 步 · 选门店</text>
+    </view>
+
+    <text class="section-title">在哪儿吃？</text>
+    <text class="section-copy">位置只用于本次推荐附近门店，不会持续定位。</text>
+    <text wx:if="{{agentFeedback}}" class="store-hint">{{agentFeedback}}</text>
+
+    <view class="card">
+      <text class="card-icon">📍</text>
+      <text class="card-title">用当前位置找附近门店</text>
+      <text class="card-copy">仅本次使用，拒绝定位也可以继续。</text>
+      <button class="cta card-cta" bindtap="allowLocation">允许一次性定位</button>
+      <button class="ghost-btn" bindtap="openManualCity">手动选择城市</button>
+      <text wx:if="{{locationStatus}}" class="store-hint">{{locationStatus}}</text>
+      <button wx:if="{{!tokenLinked}}" class="secondary-btn card-cta" bindtap="openConnection">链接 MCP 后查询真实门店</button>
+    </view>
+
+    <view class="card manual" wx:if="{{showCityPicker}}">
+      <text class="manual-title">选择城市和附近商圈</text>
+      <view class="city-grid">
+        <button
+          wx:for="{{cities}}"
+          wx:key="name"
+          class="city-chip {{selectedCity === item.name ? 'active' : ''}}"
+          data-city="{{item.name}}"
+          bindtap="selectCity"
+        >{{item.name}}</button>
+      </view>
+      <input class="settings-input" value="{{locationKeyword}}" bindinput="onLocationKeywordInput" placeholder="附近商圈 / 街道（可选）" />
+      <button class="cta card-cta" disabled="{{!selectedCity || storesLoading}}" bindtap="confirmCity">{{storesLoading ? '正在查询门店…' : '查询真实门店'}}</button>
+      <button class="ghost-btn" bindtap="useGeneralSnapshot">都不合适，用通用菜单快照</button>
+    </view>
+    <text wx:if="{{storesError}}" class="store-error location-query-error">{{storesError}}</text>
+
+    <view class="card store-list-card" wx:if="{{storesLoading || stores.length}}">
+      <text class="manual-title">选择一家门店</text>
+      <text wx:if="{{storesLoading}}" class="store-hint">正在从麦当劳 MCP 查询可用门店…</text>
+      <view wx:if="{{!storesLoading}}" class="store-list">
+        <button
+          wx:for="{{stores}}"
+          wx:key="storeCode"
+          class="store-option {{selectedStore && selectedStore.storeCode === item.storeCode ? 'active' : ''}}"
+          data-code="{{item.storeCode}}"
+          bindtap="selectStore"
+          disabled="{{!item.businessStatus}}"
+        >
+          <view class="store-option-main">
+            <text class="store-option-name">{{item.storeName}}</text>
+            <text wx:if="{{item.address}}" class="store-option-address">{{item.address}}</text>
+          </view>
+          <view class="store-option-meta">
+            <text wx:if="{{index === 0 && item.businessStatus}}" class="store-status open">最近</text>
+            <text class="store-status {{item.businessStatus ? 'open' : 'closed'}}">{{item.businessStatus ? '营业中' : '暂停营业'}}</text>
+            <text wx:if="{{item.distance !== null}}" class="store-distance">{{item.distance}}m</text>
+          </view>
+        </button>
+      </view>
+      <button class="cta card-cta" disabled="{{!selectedStore || storesLoading}}" bindtap="confirmStore">确认餐厅，继续选餐</button>
+      <button class="secondary-btn card-cta" disabled="{{!selectedStore}}" bindtap="chooseSelectedStoreLocation">在地图上标记这家门店</button>
+      <text class="store-hint">门店和营业状态来自本次 MCP 查询；推荐阶段仍只调用只读工具。</text>
+    </view>
+
+    <view wx:if="{{mapCenter}}" class="card map-card">
+      <view class="map-heading">
+        <view>
+          <text class="manual-title">门店地图</text>
+          <text class="store-hint map-subtitle">蓝点是本次定位；红色标记是你在地图上选定的推荐门店。</text>
+        </view>
+        <text class="map-privacy">仅本页</text>
+      </view>
+      <map
+        class="store-map"
+        latitude="{{mapCenter.latitude}}"
+        longitude="{{mapCenter.longitude}}"
+        scale="{{mapScale}}"
+        markers="{{mapMarkers}}"
+        show-location="{{hasLocation}}"
+        enable-rotate="{{false}}"
+        enable-overlooking="{{false}}"
+      ></map>
+      <text wx:if="{{mapHint}}" class="store-hint">{{mapHint}}</text>
+      <button class="cta card-cta" disabled="{{!selectedStorePoint}}" bindtap="openRouteToStore">在微信地图中规划路线</button>
+      <text class="store-hint">MCP 门店结果只提供地址和距离时，需要你在地图上点一次门店位置；坐标不会写入账号、日志或模型请求。</text>
+    </view>
+  </block>
+
+  <!-- ============ 选好门店后使用 Agent ============ -->
+  <block wx:if="{{stage === 'agent'}}">
+    <view class="topbar">
+      <button class="back-btn" bindtap="startFlow">‹ 更换餐厅</button>
+      <text class="step-label">第 2 步 · 按餐厅选餐</text>
+    </view>
+    <view class="card selected-restaurant">
+      <text class="settings-label">已选餐厅 · 到店取餐</text>
+      <text class="card-title">{{selectedStore.storeName}}</text>
+      <text class="card-copy">{{selectedStore.address}}</text>
+      <map wx:if="{{selectedStorePoint}}" class="store-map" latitude="{{selectedStorePoint.latitude}}" longitude="{{selectedStorePoint.longitude}}" markers="{{mapMarkers}}" show-location="{{hasLocation}}" scale="16"></map>
+      <button class="secondary-btn card-cta" bindtap="openRouteToStore">{{selectedStorePoint ? '在微信地图中规划路线' : '在地图上确认位置 / 导航'}}</button>
+      <text wx:if="{{mapHint}}" class="store-hint">{{mapHint}}</text>
+    </view>
+    <view class="agent-entry agent-composer">
+      <view class="agent-entry-heading">
+        <text class="agent-entry-kicker">让 Agent 来选</text>
+        <button class="agent-provider-switch" disabled="{{agentBusy}}" bindtap="openProviderSettings">切换供应商 ›</button>
+      </view>
+      <text class="agent-provider-current">{{providerReady ? '当前：' + activeProvider.label + ' · ' + activeProvider.model : '正在确认供应商…'}}</text>
+      <text class="agent-entry-copy">例如“预算 40 元，清淡一点，不要可乐”。Agent 只查询上方餐厅的菜单。</text>
+      <text class="agent-entry-copy">发送后，选餐要求和必要上下文会交由当前 AI 供应商处理。请勿输入密码、Token 或其他无关个人信息。</text>
+      <input class="agent-input" value="{{agentMessage}}" bindinput="onAgentInput" placeholder="说说预算、口味和不想吃的" placeholder-class="agent-placeholder" maxlength="120" />
+      <button class="agent-submit" disabled="{{!agentMessage || agentBusy}}" bindtap="runAgentMessage">{{agentBusy ? '正在理解并查询…' : '按这家餐厅帮我选'}}</button>
+      <text wx:if="{{agentFeedback}}" class="agent-feedback">{{agentFeedback}}</text>
+    </view>
+    <button class="ghost-btn" bindtap="startQuestionnaire">也可以回答三个问题选餐</button>
+    <button class="ghost-btn" bindtap="backToHome">返回首页</button>
+  </block>
+
+  <!-- ============ Agent 等待：真实结果返回前不挂载推荐卡 ============ -->
+  <block wx:if="{{stage === 'agent-waiting'}}">
+    <view class="topbar">
+      <button class="back-btn" bindtap="leaveAgentWaiting">‹ 返回修改</button>
+      <text class="step-label">Agent 选餐</text>
+    </view>
+    <view class="agent-wait-card" role="status" aria-live="polite">
+      <view wx:if="{{agentBusy}}" class="agent-wait-symbol">
+        <view class="agent-wait-spinner"></view>
+        <text class="agent-wait-mark">麦</text>
+      </view>
+      <view wx:else class="agent-wait-error-symbol">!</view>
+      <text class="agent-wait-title">{{agentBusy ? '正在为你搭配这一餐' : '这次没选出来'}}</text>
+      <text class="agent-wait-copy">{{agentBusy ? '正在根据你的要求查询门店菜单、搭配餐品和核对营养，请稍候。' : agentError}}</text>
+      <view class="agent-wait-context">
+        <text class="agent-wait-store">{{selectedStore.storeName}}</text>
+        <text class="agent-wait-request">{{agentMessage}}</text>
+      </view>
+      <button wx:if="{{!agentBusy}}" class="cta agent-wait-retry" bindtap="runAgentMessage">重新试一次</button>
+      <button wx:if="{{agentErrorCode === 'version_conflict'}}" class="secondary-btn agent-wait-retry" bindtap="refreshConversation">读取最新方案</button>
+      <button class="ghost-btn" bindtap="leaveAgentWaiting">返回修改要求</button>
+    </view>
+  </block>
+
+  <!-- ============ 提问 ============ -->
+  <block wx:if="{{stage === 'question'}}">
+    <view class="topbar">
+      <button class="back-btn" bindtap="backToLocation">‹ 返回</button>
+      <text class="step-label">{{locationLabel}}</text>
+    </view>
+
+    <view class="progress">
+      <view class="progress-fill" style="width: {{progress}}%"></view>
+    </view>
+
+    <text class="question-kicker">问题 {{questionIndex + 1}} / 3</text>
+    <text class="section-title">{{currentQuestion.title}}</text>
+    <text class="section-copy">{{currentQuestion.copy}}</text>
+
+    <view class="choice-list">
+      <button
+        wx:for="{{currentQuestion.options}}"
+        wx:key="value"
+        class="choice {{answers[currentQuestion.key] === item.value ? 'selected' : ''}}"
+        data-key="{{currentQuestion.key}}"
+        data-value="{{item.value}}"
+        bindtap="selectAnswer"
+      >
+        <text class="choice-label">{{item.label}}</text>
+        <text class="choice-check" wx:if="{{answers[currentQuestion.key] === item.value}}">✓</text>
+      </button>
+    </view>
+
+    <view class="question-footer">
+      <button class="ghost-btn" bindtap="skipQuestion">跳过</button>
+      <button class="cta footer-cta" bindtap="nextQuestion">{{questionIndex >= 2 ? '生成推荐' : '下一题'}}</button>
+    </view>
+  </block>
+
+  <!-- ============ 推荐结果 ============ -->
+  <block wx:if="{{stage === 'result'}}">
+    <view class="result-hero">
+      <text class="result-kicker">为你搭配 · {{locationLabel}}</text>
+      <text class="result-title">{{recommendationConflict ? '需要调整条件' : recommendation.name}}</text>
+      <text class="result-sub">{{recommendationConflict ? '请放宽预算或其他偏好后重试' : recommendation.subtitle}}</text>
+      <view class="badge-row">
+        <text class="badge badge-warn">{{recommendationConflict ? '未生成推荐' : (recommendation.dataStatus + '数据 · ' + recommendation.updatedAt)}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{conversation}}" class="card revision-card">
+      <text class="card-title-sm">继续调整这一餐</text>
+      <text class="setting-copy">门店和已有要求会保留。可以说“饮料换成无糖的，其他不变”或“再便宜五块”。</text>
+      <view wx:if="{{agentChanges.length}}" class="revision-changes">
+        <text wx:for="{{agentChanges}}" wx:key="*this" class="revision-change">{{item}}</text>
+      </view>
+      <input class="agent-input" value="{{agentMessage}}" bindinput="onAgentInput" placeholder="这次想调整什么？" maxlength="240" />
+      <button class="agent-submit" disabled="{{!agentMessage || agentBusy || alternativeBusy}}" bindtap="runAgentMessage">按这个要求调整</button>
+      <text wx:if="{{alternativeBusy}}" class="setting-copy">正在切换方案…</text>
+    </view>
+
+    <view wx:if="{{!recommendationConflict}}" class="card meal-card">
+      <view class="meal-items">
+        <view class="meal-item" wx:for="{{recommendation.items}}" wx:key="name">
+          <view class="meal-item-left">
+            <text class="item-type">{{item.type}}</text>
+            <text class="item-name">{{item.name}}{{item.supportModify ? '【可特调】' : ''}}</text>
+          </view>
+          <text class="item-price">{{item.price}}</text>
+        </view>
+      </view>
+
+      <view class="stats-row">
+        <view class="stat">
+          <text class="stat-value">{{recommendation.nutrition.energyKcal}}</text>
+          <text class="stat-label">热量 kcal</text>
+        </view>
+        <view class="stat">
+          <text class="stat-value">{{recommendation.nutrition.protein}}</text>
+          <text class="stat-label">蛋白质 g</text>
+        </view>
+        <view class="stat">
+          <text class="stat-value">{{recommendation.nutrition.sodium}}</text>
+          <text class="stat-label">钠 mg</text>
+        </view>
+      </view>
+      <view wx:if="{{recommendation.nutrition.items}}" class="nutrition-detail">
+        <text class="nutrition-coverage">{{recommendation.nutrition.coverage}} · {{recommendation.nutrition.note}}</text>
+        <view wx:for="{{recommendation.nutrition.items}}" wx:key="name" class="nutrition-item">
+          <text class="nutrition-item-name">{{item.name}}</text>
+          <text class="nutrition-item-values">热量 {{item.energyKcal === null ? '—' : item.energyKcal}} kcal · 蛋白质 {{item.protein === null ? '—' : item.protein}} g · 钠 {{item.sodium === null ? '—' : item.sodium}} mg</text>
+          <text wx:if="{{item.reason}}" class="nutrition-item-reason">{{item.reason}}</text>
+        </view>
+      </view>
+
+      <view class="price-row">
+        <text class="price">¥{{recommendation.total}}</text>
+        <text class="price-source">{{recommendation.priceSource}}</text>
+      </view>
+
+      <view class="reason">
+        <text class="reason-title">为什么是这一餐</text>
+        <text class="reason-copy">{{recommendation.reason}}</text>
+      </view>
+
+      <text wx:if="{{recommendationLoading}}" class="source-line">正在查询实时 MCP 菜单…</text>
+      <text wx:if="{{recommendationError}}" class="source-line">{{recommendationError}}</text>
+      <text class="source-line">营养来源：{{recommendation.nutrition.source}}</text>
+    </view>
+
+    <view wx:if="{{mapCenter && selectedStore}}" class="card map-card result-map-card">
+      <view class="map-heading">
+        <view>
+          <text class="manual-title">去这家门店</text>
+          <text class="store-hint map-subtitle">{{selectedStore.storeName}}</text>
+        </view>
+        <text class="map-privacy">仅本页</text>
+      </view>
+      <map
+        class="store-map"
+        latitude="{{mapCenter.latitude}}"
+        longitude="{{mapCenter.longitude}}"
+        scale="{{mapScale}}"
+        markers="{{mapMarkers}}"
+        show-location="{{hasLocation}}"
+        enable-rotate="{{false}}"
+        enable-overlooking="{{false}}"
+      ></map>
+      <text wx:if="{{mapHint}}" class="store-hint">{{mapHint}}</text>
+      <button class="cta card-cta" disabled="{{!selectedStorePoint}}" bindtap="openRouteToStore">在微信地图中规划路线</button>
+      <text class="store-hint">路线由微信地图接管；麦麦管家不会保存精确坐标。</text>
+    </view>
+
+    <view wx:if="{{recommendationConflict}}" class="card constraint-card">
+      <text class="constraint-title">暂时没有同时符合这些要求的搭配</text>
+      <text class="constraint-reason">{{recommendationConflict.reason}}</text>
+      <text class="constraint-question">{{recommendationConflict.question}}</text>
+    </view>
+
+    <block wx:if="{{!recommendationConflict}}">
+    <text class="alt-title">换一换</text>
+    <view
+      class="alt"
+      wx:for="{{alternatives}}"
+      wx:key="name"
+      data-name="{{item.name}}"
+      bindtap="chooseAlternative"
+    >
+      <view class="alt-index">{{index + 1}}</view>
+      <view class="alt-content">
+        <text class="alt-name">{{item.name}}</text>
+        <text class="alt-meta">{{item.summary}}</text>
+        <text class="alt-reason">{{item.agentReason || item.reason}}</text>
+      </view>
+      <text class="alt-arrow">›</text>
+    </view>
+
+    <view wx:if="{{orderDraft}}" class="order-draft-card">
+      <view class="order-draft-heading">
+        <text class="disabled-order-title">订单草稿 · 待你确认</text>
+        <text class="order-draft-state">只读</text>
+      </view>
+      <text class="order-draft-store">{{orderDraft.location || orderDraft.store.storeName}}</text>
+      <view class="order-draft-items">
+        <view wx:for="{{orderDraft.items}}" wx:key="name" class="order-draft-item">
+          <text>{{item.name}}</text>
+          <text>{{item.price}}</text>
+        </view>
+      </view>
+      <view class="order-draft-total"><text>预计合计</text><text>¥{{orderDraft.total}}</text></view>
+      <text class="disabled-order-copy">{{orderDraft.payment.message}}</text>
+      <button class="cta checkout-primary" disabled="{{!conversation || !tokenLinked || agentBusy || recommendationLoading}}" bindtap="openCheckout">查看官方报价与确认清单</button>
+    </view>
+    </block>
+
+    <view class="card setting-card">
+      <view class="setting-row">
+        <view class="setting-body">
+          <text class="card-title-sm">记忆与个性化</text>
+          <text class="setting-copy">{{memoryStatus}}</text>
+        </view>
+        <switch checked="{{memoryAgreed}}" disabled="{{preferencesBusy}}" bindchange="toggleMemory" color="#DB241C" />
+      </view>
+      <text class="setting-copy">仅保存预算、口味和排除项，不保存原始对话、定位或凭据。</text>
+      <button wx:if="{{conversation}}" class="ghost-btn" disabled="{{!memoryAgreed || preferencesBusy || !preferencesReady}}" bindtap="saveConversationPreferences">保存本轮要求为偏好</button>
+      <text wx:if="{{preferencesFeedback}}" class="setting-copy">{{preferencesFeedback}}</text>
+      <view class="divider"></view>
+      <view class="setting-row" bindtap="showTokenNotice">
+        <view class="setting-body">
+          <text class="card-title-sm">链接麦当劳账号</text>
+          <text class="setting-copy">{{tokenStatus}}</text>
+        </view>
+        <text class="alt-arrow">›</text>
+      </view>
+    </view>
+
+    <view wx:if="{{!tokenLinked}}" class="mcp-connect-card result-mcp-card">
+      <text class="mcp-kicker">麦当劳 MCP</text>
+      <text class="mcp-title">登录麦当劳 MCP，复制 Token 后粘贴</text>
+      <text class="mcp-copy">{{tokenLinked ? '已链接。重新生成推荐时会先查询实时门店和菜单。' : '当前尚未链接 Token，推荐会使用明确标注的演示数据。'}}</text>
+      <button class="ghost-btn" bindtap="openConnection">前往链接页</button>
+    </view>
+
+    <view class="result-actions">
+      <button class="secondary-btn" bindtap="backToQuestion">重新回答</button>
+      <button class="ghost-btn" bindtap="restart">换个门店再来一次</button>
+      <button class="ghost-btn" bindtap="backToHome">返回首页</button>
+    </view>
+
+    <text class="footer-note">麦麦管家免费，不收取餐费；所有餐费仅支付给麦当劳官方。</text>
+  </block>
+
+  <block wx:if="{{stage === 'checkout'}}">
+    <view class="topbar"><button class="back-btn" disabled="{{checkoutBusy}}" bindtap="closeCheckout">‹ 返回选餐</button><text class="step-label">确认清单</text></view>
+    <text class="section-title">核对这一餐</text>
+    <text class="section-copy">{{locationLabel}} · 到店取餐</text>
+    <view class="card checkout-card">
+      <view wx:for="{{recommendation.items}}" wx:key="code" class="checkout-item">
+        <view class="checkout-item-name"><text class="card-title-sm">{{item.name}}</text><text class="setting-copy">{{item.type}} · 官方默认规格</text></view>
+        <view class="quantity-control"><button disabled="{{checkoutBusy || checkoutQuantities[item.code] <= 1}}" data-code="{{item.code}}" data-delta="-1" bindtap="changeQuoteQuantity">−</button><text>{{checkoutQuantities[item.code]}}</text><button disabled="{{checkoutBusy || checkoutQuantities[item.code] >= 10}}" data-code="{{item.code}}" data-delta="1" bindtap="changeQuoteQuantity">+</button></view>
+      </view>
+      <view class="setting-row"><text class="card-title-sm">需要餐具</text><switch checked="{{needTableware}}" disabled="{{checkoutBusy}}" color="#DB241C" bindchange="changeTableware" /></view>
+      <text class="setting-copy">每次调整数量或餐具都会重新向官方算价。</text>
+    </view>
+    <view wx:if="{{checkoutBusy}}" class="card"><text class="card-title-sm">正在核对官方信息…</text><text class="setting-copy">请稍候，完成后可继续操作。</text></view>
+    <view wx:if="{{checkout && !checkoutBusy}}" class="card checkout-card">
+      <text class="card-title-sm">麦当劳官方报价</text>
+      <view wx:for="{{checkout.quote.items}}" wx:key="code" class="quote-line"><view><text>{{item.officialName}} × {{item.quantity}}</text><text class="quote-spec">{{item.specification}}</text></view><text>¥{{item.subtotal}}</text></view>
+      <view class="divider"></view>
+      <view class="quote-line"><text>商品金额</text><text>¥{{checkout.quote.productTotal}}</text></view>
+      <view class="quote-line"><text>优惠金额</text><text>¥{{checkout.quote.discount}}</text></view>
+      <view class="quote-line"><text>打包费</text><text>¥{{checkout.quote.packing}}</text></view>
+      <view class="quote-line"><text>配送费</text><text>¥{{checkout.quote.delivery}}</text></view>
+      <view class="quote-line"><text>餐具费</text><text>¥{{checkout.quote.tableware}}</text></view>
+      <view class="order-draft-total"><text>官方应付合计</text><text>¥{{checkout.quote.total}}</text></view>
+      <text class="source-line">报价有效期 5 分钟 · 提交前再次核价 · “—”表示官方未返回该项</text>
+      <view wx:if="{{checkout.overBudget}}" class="checkout-notice"><text>超过本轮 ¥{{checkout.budgetMax}} 预算</text><view class="setting-row"><text>我接受本次超出预算</text><switch checked="{{acceptOverBudget}}" bindchange="acceptQuoteBudget" color="#DB241C" /></view></view>
+      <text class="settings-label">选择取餐方式</text>
+      <button wx:for="{{checkout.quote.takeWays}}" wx:key="code" class="take-way {{takeWayCode === item.code ? 'selected' : ''}}" data-code="{{item.code}}" bindtap="selectTakeWay"><text>{{item.title}}</text><text class="quote-spec">{{item.subtitle}}</text></button>
+      <text wx:if="{{!checkout.gate.enabled}}" class="checkout-notice">当前账号暂未开放真实下单，可先核对官方报价。</text>
+      <text wx:if="{{checkout.gate.enabled && checkout.gate.maxTotalCents}}" class="setting-copy">当前账号可确认创建真实订单，单笔上限 ¥{{checkout.gate.maxTotalCents / 100}}。</text>
+      <text wx:if="{{checkout.gate.maxTotalCents && checkout.quote.totalCents > checkout.gate.maxTotalCents}}" class="checkout-notice">本清单超过单笔上限，请减少数量或返回调整餐品。</text>
+      <button class="cta checkout-primary" disabled="{{!checkout.gate.enabled || !takeWayCode || checkout.overBudget && !acceptOverBudget || checkout.gate.maxTotalCents && checkout.quote.totalCents > checkout.gate.maxTotalCents}}" bindtap="confirmCheckout">确认创建订单 · ¥{{checkout.quote.total}}</button>
+    </view>
+    <text wx:if="{{checkoutError}}" class="checkout-notice">{{checkoutError}}</text>
+    <button class="ghost-btn" disabled="{{checkoutBusy}}" bindtap="requestQuote">重新获取官方报价</button>
+    <button class="ghost-btn" disabled="{{checkoutBusy}}" bindtap="openOrders">查看我的订单</button>
+    <text class="footer-note">餐费只支付给麦当劳官方；创建订单后仍需你完成付款。</text>
+  </block>
+
+  <block wx:if="{{stage === 'orders'}}">
+    <view class="topbar"><button class="back-btn" bindtap="closeOrders">‹ 返回</button><text class="step-label">我的订单</text></view>
+    <text class="section-title">在管家提交的订单</text>
+    <text class="section-copy">列表显示上次查询结果，点开可刷新官方状态。</text>
+    <button class="ghost-btn" disabled="{{ordersBusy}}" bindtap="loadOrders">{{ordersBusy ? '读取中…' : '刷新列表'}}</button>
+    <text wx:if="{{ordersError}}" class="checkout-notice">{{ordersError}}</text>
+    <view wx:if="{{!ordersBusy && !orders.length}}" class="card"><text class="card-title-sm">还没有提交记录</text><text class="setting-copy">确认创建后的订单会显示在这里。</text></view>
+    <view wx:for="{{orders}}" wx:key="id" class="card order-list-card" data-id="{{item.id}}" bindtap="openOrder"><view class="order-draft-heading"><text class="card-title-sm">{{item.store.storeName || '已选餐厅'}}</text><text class="order-draft-state">{{item.order ? item.order.statusText : '提交待核实'}}</text></view><text class="setting-copy">{{item.order ? item.order.orderId : '请点开查询本次提交结果'}}</text><text class="order-list-price">¥{{item.order ? item.order.total : item.quote.total}}</text></view>
+  </block>
+
+  <block wx:if="{{stage === 'order' && checkout}}">
+    <view class="topbar"><button class="back-btn" disabled="{{checkoutBusy}}" bindtap="backToOrders">‹ 我的订单</button><text class="step-label">订单状态</text></view>
+    <text class="section-title">{{checkout.order ? checkout.order.statusText : checkout.state === 'quoted' ? '尚未提交' : '提交结果待核实'}}</text>
+    <text class="section-copy">{{checkout.order.storeName || checkout.store.storeName || locationLabel}}</text>
+    <view wx:if="{{checkout.state !== 'quoted'}}" class="card official-payment-card">
+      <text class="card-title-sm">{{checkout.order.status === '1' ? '订单已创建，前往官方付款' : '前往官方查看这笔订单'}}</text>
+      <text class="setting-copy">{{checkout.order.status === '1' ? '使用绑定的同一麦当劳账号，在官方“我的订单”找到本笔未付款订单，核对金额后付款，无需重新下单。' : '使用绑定的同一麦当劳账号，在官方“我的订单”核对本笔订单的状态，请勿重复创建订单。'}}</text>
+      <button class="cta checkout-primary" disabled="{{checkoutBusy || officialJumpBusy}}" loading="{{officialJumpBusy}}" bindtap="openOfficialMiniProgram">打开麦当劳官方小程序</button>
+      <button wx:if="{{checkout.canPay}}" class="secondary-btn" disabled="{{checkoutBusy || officialJumpBusy}}" bindtap="openPayment">打开本笔订单官方付款页</button>
+      <button wx:if="{{checkout.order.orderId}}" class="ghost-btn" bindtap="copyOfficialOrderId">复制订单号</button>
+      <button class="ghost-btn" bindtap="copyOfficialMiniProgramLink">无法跳转？复制官方小程序链接</button>
+      <text wx:if="{{officialJumpFeedback}}" class="setting-copy">{{officialJumpFeedback}}</text>
+      <text class="setting-copy">返回后自动查询最新状态，也可以点击下方“刷新官方订单状态”。</text>
+    </view>
+    <view class="card checkout-card">
+      <text wx:if="{{checkout.order}}" class="card-title-sm">订单 {{checkout.order.orderId}}</text>
+      <text wx:if="{{checkout.order.pickupCode}}" class="pickup-code">取餐码 {{checkout.order.pickupCode}}</text>
+      <text wx:if="{{checkout.order}}" class="setting-copy">{{checkout.order.takeWay}} · ¥{{checkout.order.total}}</text>
+      <view wx:for="{{checkout.quote.items}}" wx:key="code" class="quote-line"><text>{{item.name}}</text><text>× {{item.quantity}}</text></view>
+      <text wx:if="{{checkout.order.checkedAt}}" class="source-line">上次查询 {{checkout.order.checkedAt}}</text>
+      <text wx:if="{{checkout.order.expirePayTime && checkout.order.status === '1'}}" class="setting-copy">官方付款截止（北京时间）{{checkout.order.expirePayTime}}</text>
+    </view>
+    <text wx:if="{{checkout.recoveryMessage}}" class="checkout-notice">{{checkout.recoveryMessage}}</text>
+    <view wx:if="{{checkout.recoveryCandidate}}" class="card"><text class="card-title-sm">待你核对的官方订单</text><text class="setting-copy">{{checkout.recoveryCandidate.orderId}} · {{checkout.recoveryCandidate.statusText}} · ¥{{checkout.recoveryCandidate.total}}</text><text class="setting-copy">{{checkout.recoveryCandidate.createdAt}}</text><button class="secondary-btn" disabled="{{checkoutBusy}}" bindtap="confirmRecoveredOrder">核对并关联这笔订单</button></view>
+    <text wx:if="{{checkoutError}}" class="checkout-notice">{{checkoutError}}</text>
+    <button class="cta checkout-primary" disabled="{{checkoutBusy}}" bindtap="refreshOrder">{{checkoutBusy ? '正在处理…' : '刷新官方订单状态'}}</button>
+    <button wx:if="{{checkout.state === 'quoted'}}" class="secondary-btn" disabled="{{checkoutBusy}}" bindtap="resumeCheckout">返回确认清单</button>
+    <button wx:if="{{checkout.canCancel}}" class="ghost-btn" disabled="{{checkoutBusy}}" bindtap="cancelOrder">取消这笔未付款订单</button>
+    <text class="footer-note">付款或取消是否成功以官方查询结果为准。无法打开付款页时，请到麦当劳官方 App 查看订单。</text>
+  </block>
+
+  <!-- ============ 我的 ============ -->
+  <block wx:if="{{stage === 'profile'}}">
+    <view class="topbar profile-topbar">
+      <button class="back-btn" bindtap="backFromAccount">‹ 返回</button>
+      <text class="step-label">我的</text>
+    </view>
+
+    <view class="profile-hero">
+      <image wx:if="{{userProfile.avatarUrl}}" class="profile-avatar profile-avatar-image" src="{{userProfile.avatarUrl}}" binderror="onSavedAvatarError" mode="aspectFill"></image>
+      <view wx:else class="profile-avatar">麦</view>
+      <view class="profile-identity">
+        <text class="profile-name">{{userProfile.nickName}}</text>
+        <text class="profile-status">{{loginStatus}}</text>
+      </view>
+    </view>
+
+    <button wx:if="{{loggedIn}}" class="ghost-btn profile-edit-button" bindtap="editUserProfile">{{profileComplete ? '修改头像昵称' : '完善头像昵称'}}</button>
+    <button wx:else class="ghost-btn" bindtap="startWechatLogin">微信登录并完善头像昵称</button>
+
+    <text class="section-title profile-section-title">我的个性化信息</text>
+    <text class="section-copy">偏好由你明确保存，可停用、修改或删除；本次明确要求优先。</text>
+
+    <view class="profile-grid">
+      <view class="profile-stat">
+        <text class="profile-stat-label">预算偏好</text>
+        <text class="profile-stat-value">{{agentSettings.budgetMax === null ? '预算随意' : '¥' + agentSettings.budgetMax + '以内'}}</text>
+      </view>
+      <view class="profile-stat">
+        <text class="profile-stat-label">口味偏好</text>
+        <text class="profile-stat-value">{{agentSettings.mood === 'light' ? '清爽' : agentSettings.mood === 'satisfying' ? '满足' : '均衡'}}</text>
+      </view>
+      <view class="profile-stat">
+        <text class="profile-stat-label">就餐方式</text>
+        <text class="profile-stat-value">{{answers.mode === 'delivery' ? '外送到家' : '到店取餐'}}</text>
+      </view>
+      <view class="profile-stat">
+        <text class="profile-stat-label">记忆状态</text>
+        <text class="profile-stat-value">{{preferences.enabled ? '已保存并启用' : preferences.saved ? '已保存但停用' : '未保存'}}</text>
+      </view>
+    </view>
+
+    <view class="card profile-recommendation">
+      <text class="card-title-sm">最近一次推荐</text>
+      <text class="profile-meal-name">{{recommendation.name}}</text>
+      <text class="setting-copy">{{recommendation.subtitle}}</text>
+      <text class="source-line">{{recommendation.dataStatus}}数据 · {{recommendation.updatedAt}}</text>
+    </view>
+
+    <view class="card settings-card">
+      <text class="card-title-sm">Agent 偏好设置</text>
+      <text class="setting-copy">修改用于新一轮选餐。勾选同意并保存后，下次会自动恢复。</text>
+      <text class="settings-label">默认预算</text>
+      <view class="settings-chips">
+        <button class="choice-chip {{agentSettings.budget === 'light' ? 'active' : ''}}" data-key="budget" data-value="light" bindtap="setAgentSetting">¥25 以内</button>
+        <button class="choice-chip {{agentSettings.budget === 'standard' ? 'active' : ''}}" data-key="budget" data-value="standard" bindtap="setAgentSetting">¥25–40</button>
+        <button class="choice-chip {{agentSettings.budget === 'free' ? 'active' : ''}}" data-key="budget" data-value="free" bindtap="setAgentSetting">预算随意</button>
+      </view>
+      <input class="settings-input" type="digit" value="{{preferenceBudgetInput}}" bindinput="onPreferenceBudgetInput" placeholder="自定义预算上限，留空不限" />
+      <text class="settings-label">口味倾向</text>
+      <view class="settings-chips">
+        <button class="choice-chip {{agentSettings.mood === 'light' ? 'active' : ''}}" data-key="mood" data-value="light" bindtap="setAgentSetting">清爽</button>
+        <button class="choice-chip {{agentSettings.mood === 'balanced' ? 'active' : ''}}" data-key="mood" data-value="balanced" bindtap="setAgentSetting">均衡</button>
+        <button class="choice-chip {{agentSettings.mood === 'satisfying' ? 'active' : ''}}" data-key="mood" data-value="satisfying" bindtap="setAgentSetting">满足</button>
+      </view>
+      <input class="settings-input" value="{{agentSettings.dietary === '未设置' ? '' : agentSettings.dietary}}" data-key="dietary" bindinput="onAgentSettingInput" placeholder="饮食限制，例如：不辣、素食（可留空）" />
+      <input class="settings-input" value="{{agentSettings.exclusions === '未设置' ? '' : agentSettings.exclusions}}" data-key="exclusions" bindinput="onAgentSettingInput" placeholder="明确不想要，例如：可乐、辣（可留空）" />
+      <view class="setting-row compact-setting-row">
+        <view class="setting-body"><text class="card-title-sm">显示详细推荐理由</text><text class="setting-copy">{{agentSettings.detailedReason ? '已开启' : '已关闭'}}</text></view>
+        <switch checked="{{agentSettings.detailedReason}}" bindchange="toggleDetailedReason" color="#DB241C" />
+      </view>
+      <view class="setting-row compact-setting-row">
+        <view class="setting-body"><text class="card-title-sm">同意保存选餐偏好</text><text class="setting-copy">{{memoryStatus}}</text></view>
+        <switch checked="{{memoryAgreed}}" disabled="{{preferencesBusy}}" bindchange="toggleMemory" color="#DB241C" />
+      </view>
+      <button class="secondary-btn provider-save-btn" disabled="{{!memoryAgreed || preferencesBusy || !preferencesReady || !preferenceBudgetValid}}" bindtap="savePreferences">{{preferencesBusy ? '正在处理…' : '保存偏好到账号'}}</button>
+      <button class="ghost-btn" disabled="{{preferencesBusy}}" bindtap="refreshPreferences">重新读取已保存偏好</button>
+      <button wx:if="{{preferences.saved}}" class="ghost-btn" bindtap="copyPreferences">复制已保存偏好</button>
+      <button wx:if="{{preferences.saved}}" class="ghost-btn" disabled="{{preferencesBusy}}" bindtap="deletePreferences">删除已保存偏好</button>
+      <text wx:if="{{preferencesFeedback}}" class="setting-copy provider-feedback">{{preferencesFeedback}}</text>
+    </view>
+
+    <view class="card settings-card">
+      <text class="card-title-sm">Agent 供应商</text>
+      <text class="setting-copy">{{providerReady ? activeProvider.label + ' · ' + activeProvider.model : '尚未确认当前配置'}}</text>
+      <button class="secondary-btn provider-save-btn" bindtap="openProviderSettings">切换供应商 / 配置模型</button>
+    </view>
+
+    <view class="card settings-card test-access-card">
+      <text class="card-title-sm">下单权限</text>
+      <text class="setting-copy">{{testAccessText}}</text>
+      <text wx:if="{{testAccountId}}" class="setting-copy">账号标识：{{testAccountLabel}}</text>
+      <button class="secondary-btn provider-save-btn" disabled="{{testAccountBusy}}" loading="{{testAccountBusy}}" bindtap="loadTestAccount">刷新下单权限</button>
+      <button wx:if="{{testAccountId}}" class="ghost-btn" disabled="{{testAccountBusy}}" bindtap="copyTestAccount">复制账号标识</button>
+      <text wx:if="{{testAccountFeedback}}" class="setting-copy provider-feedback">{{testAccountFeedback}}</text>
+      <text class="setting-copy">请链接自己的麦当劳账号。每笔下单与取消都需单独确认，付款在官方页面完成。</text>
+    </view>
+
+    <view wx:if="{{!tokenLinked}}" class="mcp-connect-card profile-mcp-card">
+      <text class="mcp-kicker">账户链接</text>
+      <text class="mcp-title">去麦当劳 MCP 获取你自己的 Token</text>
+      <text class="mcp-copy">{{tokenLinked ? '已链接；推荐会尝试使用实时 MCP 数据。' : '获取 Token 后进入链接页，未链接时推荐会使用明确标注的演示数据。'}}</text>
+      <button class="ghost-btn" bindtap="openConnection">前往链接页</button>
+    </view>
+
+    <view class="result-actions profile-actions">
+      <button class="secondary-btn" bindtap="openOrders">我的订单</button>
+      <button class="secondary-btn" bindtap="startFlow">再选一餐</button>
+      <button class="ghost-btn" bindtap="openAbout">使用与隐私说明</button>
+      <button class="ghost-btn" bindtap="backToHome">返回首页</button>
+    </view>
+  </block>
+
+  <block wx:if="{{stage === 'provider'}}">
+    <view class="topbar">
+      <button class="back-btn" disabled="{{providerBusy}}" bindtap="closeProviderSettings">‹ 返回</button>
+      <text class="step-label">Agent 供应商</text>
+    </view>
+    <text class="section-title">选择你的模型</text>
+    <text class="section-copy">{{providerReady ? '当前生效：' + activeProvider.label + ' · ' + activeProvider.model : '尚未确认当前供应商'}}</text>
+    <view class="card settings-card provider-editor">
+      <view class="settings-chips provider-options">
+        <button class="choice-chip {{providerSettings.provider === 'hunyuan-v3' ? 'active' : ''}}" disabled="{{providerBusy}}" data-provider="hunyuan-v3" bindtap="selectProvider">腾讯混元 HY3</button>
+        <button class="choice-chip {{providerSettings.provider === 'openai-compatible' ? 'active' : ''}}" disabled="{{providerBusy}}" data-provider="openai-compatible" bindtap="selectProvider">自定义接口</button>
+      </view>
+      <text class="setting-copy">{{providerSettings.provider === 'hunyuan-v3' ? '使用内置混元模型，无需填写 API Key。' : '支持 OpenAI-compatible 接口，填写你的服务地址、模型和 API Key。'}}</text>
+      <label class="settings-label" for="provider-model">模型名称</label>
+      <input id="provider-model" class="settings-input provider-input" value="{{providerSettings.model}}" disabled="{{providerBusy}}" data-key="model" bindinput="onProviderSettingInput" placeholder="服务商提供的模型名称" />
+      <block wx:if="{{providerSettings.provider === 'openai-compatible'}}">
+        <label class="settings-label" for="provider-url">接口地址</label>
+        <input id="provider-url" class="settings-input provider-input" value="{{providerSettings.baseUrl}}" disabled="{{providerBusy}}" data-key="baseUrl" bindinput="onProviderSettingInput" placeholder="https://api.example.com/v1" maxlength="512" />
+        <label class="settings-label" for="provider-key">API Key</label>
+        <input wx:if="{{providerKeyVersion % 2 === 0}}" id="provider-key" class="settings-input provider-input" disabled="{{providerBusy}}" bindinput="onProviderApiKeyInput" password="{{true}}" placeholder="{{providerSettings.apiKeyConfigured ? '已保存密钥；留空继续使用' : '填写 API Key'}}" maxlength="-1" />
+        <input wx:else id="provider-key" class="settings-input provider-input" disabled="{{providerBusy}}" bindinput="onProviderApiKeyInput" password="{{true}}" placeholder="{{providerSettings.apiKeyConfigured ? '已保存密钥；留空继续使用' : '填写 API Key'}}" maxlength="-1" />
+        <text class="setting-copy">密钥加密保存在服务端，离开页面会清空输入。</text>
+        <text class="setting-copy">保存并使用后，选餐要求和必要上下文会发送到你填写的服务地址，请先确认该服务的隐私规则。</text>
+      </block>
+      <text wx:if="{{providerDirty}}" class="setting-copy provider-feedback">有未保存的更改</text>
+      <button class="cta provider-save-btn" disabled="{{providerBusy || !providerReady}}" loading="{{providerBusy}}" bindtap="saveProviderSettings">保存并切换</button>
+      <text wx:if="{{providerFeedback}}" class="setting-copy provider-feedback">{{providerFeedback}}</text>
+      <button wx:if="{{!providerReady}}" class="ghost-btn" bindtap="refreshProviderStatus">重新读取</button>
+      <button class="ghost-btn" disabled="{{providerBusy}}" bindtap="closeProviderSettings">{{providerDirty ? '放弃更改并返回' : '完成并返回'}}</button>
+    </view>
+  </block>
+
+  <!-- ============ 麦当劳 MCP 账户链接 ============ -->
+  <block wx:if="{{stage === 'connect'}}">
+    <view class="topbar">
+      <button class="back-btn" bindtap="backFromConnection">‹ 返回</button>
+      <text class="step-label">链接麦当劳 MCP</text>
+    </view>
+    <text class="section-title">链接你的麦当劳</text>
+    <text class="section-copy">仅链接你本人的麦当劳 MCP 账号</text>
+    <view class="mcp-connect-card">
+      <text class="mcp-kicker">01 · 获取 Token</text>
+      <text class="mcp-title">在麦当劳官方页面登录</text>
+      <text class="mcp-copy">登录后进入控制台，按官方提示激活并复制 Token，再返回这里。</text>
+      <button class="mcp-link-btn" bindtap="openMcpPortal">打开麦当劳 MCP 登录 ↗</button>
+      <button class="ghost-btn" bindtap="copyMcpAddress">无法打开？复制官方链接</button>
+    </view>
+    <view class="token-card">
+      <view class="token-card-heading">
+        <text class="card-title-sm">02 · 输入 Token</text>
+        <text class="connection-badge">{{tokenLinked ? '已链接' : '未链接'}}</text>
+      </view>
+      <text class="token-helper">验证只调用只读 MCP 工具。验证成功后，Token 加密保存在云端，用于你后续主动发起的查询与确认操作；输入框会清空。</text>
+      <button class="privacy-link" bindtap="openAbout">链接前查看数据用途与删除方式 ›</button>
+      <label for="mcp-token" class="token-label">你的 MCP Token</label>
+      <input wx:if="{{tokenInputVersion % 2 === 0}}" id="mcp-token" class="token-input" type="text" password="{{true}}" bindinput="onTokenInput" placeholder="在此粘贴 Token" placeholder-class="token-placeholder" maxlength="-1" />
+      <input wx:else id="mcp-token" class="token-input" type="text" password="{{true}}" bindinput="onTokenInput" placeholder="在此粘贴 Token" placeholder-class="token-placeholder" maxlength="-1" />
+      <button class="ghost-btn" disabled="{{tokenInputEmpty}}" bindtap="clearTokenInput">清空输入</button>
+      <button class="token-submit" disabled="{{tokenInputEmpty || tokenBusy}}" bindtap="submitToken">{{tokenBusy ? '正在验证…' : '验证并链接'}}</button>
+      <view wx:if="{{tokenLinked}}" class="token-lifecycle-actions">
+        <button class="ghost-btn" disabled="{{tokenBusy}}" bindtap="disconnectToken">断开链接</button>
+        <button class="danger-btn" disabled="{{tokenBusy}}" bindtap="deleteToken">删除链接</button>
+      </view>
+      <text wx:if="{{tokenFeedback}}" class="token-helper">{{tokenFeedback}}</text>
+      <text class="token-helper">输入以圆点遮挡；离开页面或切到后台即清空，不保存到本地缓存。</text>
+    </view>
+  </block>
+</view>

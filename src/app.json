@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/mcp-portal/index",
+    "pages/payment/index",
+    "pages/about/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "麦麦管家",
+    "navigationBarBackgroundColor": "#ffbc0d",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#fff8df",
+    "backgroundTextStyle": "light"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "仅用于帮你选择附近门店，本次使用后即可关闭"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

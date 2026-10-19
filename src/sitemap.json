@@ -1,0 +1,4 @@
+{
+  "desc": "麦麦管家推荐版原型",
+  "rules": [{ "action": "allow", "page": "pages/index/index" }]
+}

@@ -1,0 +1,47 @@
+{
+  "source": "McDonald's MCP read-only responses",
+  "checkedDate": "2026-10-17",
+  "nutrition": "[160]{productName,nutritionDescription,energyKj,energyKcal,protein,fat,carbohydrate,sodium,calcium}:\n  中薯条,null,1210,289,4,12,38,165,18\n  小薯条,null,877,210,3,9,28,120,13\n  麦乐鸡5块,null,890,213,12,12,13,422,9\n  巨无霸,null,2146,513,27,26,42,961,171\n  雪碧中杯,null,440,105,0,0,26,29,0\n  雪碧小杯,null,319,76,0,0,19,21,0\n  无糖可口可乐小杯,null,0,0,0,0,0,25,0\n  纯牛奶（盒装）,null,541,129,7,7,10,73,231\n  麦乐鸡4块,null,712,170,10,10,11,337,7\n  纯牛奶（盒装）,null,541,129,7,7,10,73,231",
+  "menu": [
+    {
+      "code": "1100",
+      "name": "巨无霸",
+      "currentPrice": "26.5"
+    },
+    {
+      "code": "1401",
+      "name": "麦乐鸡",
+      "currentPrice": "15"
+    },
+    {
+      "code": "3010",
+      "name": "雪碧",
+      "currentPrice": "9.5"
+    },
+    {
+      "code": "4810",
+      "name": "薯条",
+      "currentPrice": "14.5"
+    }
+  ],
+  "details": {
+    "1401": {
+      "code": "1401",
+      "name": "麦乐鸡5块",
+      "rounds": [],
+      "supportModify": false
+    },
+    "3010": {
+      "code": "3010",
+      "name": "雪碧（小杯）",
+      "rounds": [],
+      "supportModify": true
+    },
+    "4810": {
+      "code": "4810",
+      "name": "中薯条",
+      "rounds": [],
+      "supportModify": false
+    }
+  }
+}

@@ -1,0 +1,41 @@
+# Secrets and local-only configuration
+.env
+.env.*
+!.env.example
+mcp-config.local.json
+.codex/*.local.toml
+
+# Python and editor output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.idea/
+.vscode/
+
+# Local evidence that may contain account data or tokens
+evidence/local/
+*.token.txt
+*.secret.txt
+
+# Workstation state, private previews, research copies and release records
+.cloudbase/
+.workbuddy/
+.wechat-devtools-test/
+.codex/*
+!.codex/config.toml
+project.config.json
+project.private.config.json
+stdout
+research/
+evidence/
+node_modules/
+CLOUDBASE_SETUP.md
+WECHAT_RELEASE.md
+MOBILE_ACCEPTANCE.md
+specs/agent-checkout/FRIEND_TESTING.md
+assets/images/meal-hero.png
+scripts/*competitor*.py
+scripts/collect_contest_issues.py
+scripts/clone_selected.py

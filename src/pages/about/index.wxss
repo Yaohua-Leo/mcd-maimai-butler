@@ -1,0 +1,8 @@
+.about-page { padding: 36rpx 32rpx 64rpx; }
+.about-title { display: block; font-size: 42rpx; line-height: 1.4; font-weight: 800; }
+.about-intro { display: block; margin: 20rpx 0 30rpx; font-size: 26rpx; line-height: 1.8; color: #655633; }
+.about-card { margin-top: 24rpx; padding: 32rpx; background: #fff; border-radius: 24rpx; }
+.about-heading { display: block; font-size: 30rpx; font-weight: 800; }
+.about-copy { display: block; margin-top: 20rpx; font-size: 26rpx; line-height: 1.85; color: #454545; }
+.privacy-button { width: 100%; box-sizing: border-box; margin-top: 30rpx; padding: 24rpx; font-size: 26rpx; letter-spacing: 0; }
+.about-feedback { display: block; margin-top: 20rpx; font-size: 24rpx; line-height: 1.7; color: #a51c16; }

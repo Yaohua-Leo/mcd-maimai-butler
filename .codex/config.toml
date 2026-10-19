@@ -1,0 +1,20 @@
+# Project-scoped Codex configuration for the McDonald's MCP server.
+# The token is read from the local environment; never put the token in this file.
+
+[mcp_servers."mcd-mcp"]
+url = "https://mcp.mcd.cn"
+bearer_token_env_var = "MCD_MCP_TOKEN"
+enabled = true
+default_tools_approval_mode = "prompt"
+tool_timeout_sec = 60
+
+# Start with read-only tools while the Skill is being designed. Add tools only
+# after reviewing their side effects in MCP_INTEGRATION.md.
+enabled_tools = [
+  "list-nutrition-foods",
+  "query-nearby-stores",
+  "query-meals",
+  "query-meal-detail",
+  "campaign-calendar",
+  "now-time-info",
+]

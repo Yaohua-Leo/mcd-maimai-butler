@@ -1,0 +1,36 @@
+<view class="about-page">
+  <text class="about-title">使用与隐私说明</text>
+  <text class="about-intro">麦麦管家为独立开发的选餐助手，非麦当劳官方产品。麦当劳名称及相关标识归其权利人所有。</text>
+
+  <view class="about-card">
+    <text class="about-heading">选餐、订单与付款</text>
+    <text class="about-copy">推荐由 AI 和菜单数据辅助生成。请核对门店、餐品、规格、数量和官方报价；价格、供应、营养和订单状态以官方信息为准。</text>
+    <text class="about-copy">营养信息用于选餐参考，不能用于诊断或治疗。有过敏或特殊饮食要求时，请向餐厅核实配料与交叉接触风险。</text>
+    <text class="about-copy">具备下单资格的用户须逐笔确认创建或取消订单。餐费通过麦当劳官方入口支付，麦麦管家不代收餐费、不收取服务费；跳转官方入口不会重新创建订单。</text>
+  </view>
+
+  <view class="about-card">
+    <text class="about-heading">我们处理哪些信息</text>
+    <text class="about-copy">微信身份标识：云服务使用微信提供的身份标识，区分你的链接配置、偏好和订单记录。头像和昵称由你主动选择或填写，仅保存在本机用于展示，可以跳过。</text>
+    <text class="about-copy">位置：点击定位或地图选点时由微信提供位置能力，用于寻找和查看餐厅；不会持续定位。精确坐标保留在本次页面内，门店查询会使用城市和商圈关键词。拒绝定位后仍可手动选择。</text>
+    <text class="about-copy">麦当劳 MCP Token：由你从官方页面获取并主动粘贴。验证成功后加密保存在云端，仅用于调用麦当劳 MCP；不会加入 AI 提示词。输入框在离开页面或切到后台时清空，不缓存到本机。</text>
+    <text class="about-copy">选餐要求和偏好：选餐时会处理你的输入、门店菜单和必要的对话上下文；只有在你明确同意并保存后，偏好才会用于之后的选餐。</text>
+    <text class="about-copy">对话与订单记录：为继续选餐、查询状态及避免重复下单，相关记录会加密保存在云端。过期记录停止展示后，云端仍可能保留；需要进一步删除时请联系运营者。</text>
+  </view>
+
+  <view class="about-card">
+    <text class="about-heading">云服务与 AI 供应商</text>
+    <text class="about-copy">本工具使用腾讯云开发提供云端处理与存储，使用麦当劳 MCP 查询菜单、报价及订单。默认 AI 供应商为腾讯混元。</text>
+    <text class="about-copy">如果主动切换自定义 AI 接口，选餐要求和必要上下文会发送到你配置的服务地址；API Key 加密保存在云端并用于该服务。请先了解服务提供方的隐私规则，并避免输入无关个人信息。</text>
+  </view>
+
+  <view class="about-card">
+    <text class="about-heading">你可以怎样管理与删除</text>
+    <text class="about-copy">在“我的”中可修改、停用或删除已保存的选餐偏好；开始新一轮对话时会请求清除上一轮的对话记录。头像昵称可在“我的”中修改，本机缓存可通过微信清理。</text>
+    <text class="about-copy">在账户链接页选择“断开链接”，会停止使用并清除云端保存的 MCP Token；选择“删除链接”，还会删除该链接记录和其中的 AI 供应商配置与密钥。切换回腾讯混元并保存也会清除自定义 API Key。</text>
+    <text class="about-copy">上述操作不会取消麦当劳官方订单，也不会一并删除本工具的其他订单记录。如需进一步删除对话、订单或账户相关数据，请通过隐私指引中的联系方式联系运营者。</text>
+    <text class="about-copy">运营者信息、联系方式及完整个人信息处理规则请查看《小程序用户隐私保护指引》。</text>
+    <button class="cta privacy-button" bindtap="openPrivacyContract">查看完整隐私指引</button>
+    <text wx:if="{{privacyFeedback}}" class="about-feedback" role="alert">{{privacyFeedback}}</text>
+  </view>
+</view>

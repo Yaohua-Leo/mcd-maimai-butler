@@ -1,0 +1,9 @@
+<web-view wx:if="{{!failed}}" src="{{url}}" binderror="onWebError"></web-view>
+<view wx:else class="portal-fallback">
+  <text class="section-title">暂时无法打开官方页</text>
+  <text class="section-copy">可能是网络或小程序网页访问权限限制。你可以复制官方链接，在浏览器中登录，获取 Token 后再返回。</text>
+  <text class="portal-address" selectable="{{true}}">{{url}}</text>
+  <button class="cta" bindtap="copyAddress">复制官方登录链接</button>
+  <button class="secondary-btn" bindtap="retry">重新打开</button>
+  <button class="ghost-btn" bindtap="goBack">返回麦麦管家</button>
+</view>
