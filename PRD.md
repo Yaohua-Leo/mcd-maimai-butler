@@ -535,4 +535,4 @@ Provider 是 Agent Runtime 的模型适配层，不是产品本身。麦麦管�
 
 ## 14. 竞品研究入口
 
-公开参赛项目的清单、筛选样本、静态扫描和启发/避坑分析见 [`research/contest-20261010/COMPETITOR_REVIEW.md`](research/contest-20261010/COMPETITOR_REVIEW.md)。当前深读样本覆盖 22 个仓库；研究副本只读，不执行竞争者代码。
+竞品研究材料及第三方仓库副本仅保留在本地工作区，不随本参赛仓库发布，也不属于本项目原创源码。
